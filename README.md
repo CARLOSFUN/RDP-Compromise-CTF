@@ -407,8 +407,3 @@ An external IP (`159.26.106.84`) successfully authenticated to the `slflare` acc
 **Next Review:** 29-Sep-2025
 **Distribution:** Cyber Range
 
----
-
-✅ Now your README starts with a **title, badges, summary table, and timeline** → then flows into the **detailed investigation report**.
-
-Do you also want me to make the **Flags table** clickable (each answer links to its detailed Flag section)?
