@@ -186,7 +186,8 @@ DeviceRegistryEvents
 ✅ **Flag 5:** `MicrosoftUpdateSync`
 
 Inline evidence:
-![Scheduled task evidence - Flag 5](evidence/screenshots/03_task_MicrosoftUpdateSync.png)
+![Scheduled task evidence - Flag 5]<img width="1046" height="295" alt="flag5" src="https://github.com/user-attachments/assets/1be2e5df-2dc6-432f-a351-b2a76f5e982f" />
+
 
 ---
 
