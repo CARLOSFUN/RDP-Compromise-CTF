@@ -233,7 +233,8 @@ DeviceProcessEvents
 ✅ **Flag 7:** `"cmd.exe" /c systeminfo`
 
 Inline evidence:
-![cmd systeminfo - Flag 7](evidence/screenshots/05_cmd_systeminfo.png)
+![cmd systeminfo - Flag 7]<img width="1046" height="295" alt="flag7" src="https://github.com/user-attachments/assets/0a04b30a-b11c-4e89-9fec-93928f4dd338" />
+
 
 ---
 
@@ -255,7 +256,8 @@ DeviceFileEvents
 ✅ **Flag 8:** `backup_sync.zip` (typically in `%LOCALAPPDATA%\Temp`)
 
 Inline evidence:
-![backup\_sync created - Flag 8](evidence/screenshots/06_backup_sync_created.png)
+![backup\_sync created - Flag 8]<img width="1046" height="295" alt="flag8" src="https://github.com/user-attachments/assets/611ee842-9cb6-4c63-9ad0-912ed3f6abe3" />
+
 
 ---
 
