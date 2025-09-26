@@ -278,7 +278,8 @@ DeviceNetworkEvents
 ✅ **Flag 9:** `185.92.220.87`
 
 Inline evidence:
-![network C2 - Flag 9](evidence/screenshots/07_network_185.92.220.87.png)
+![network C2 - Flag 9]<img width="1205" height="295" alt="flag9" src="https://github.com/user-attachments/assets/a5035529-55f7-456d-a3e8-1b739fde99cd" />
+
 
 ---
 
@@ -299,7 +300,8 @@ DeviceProcessEvents
 ✅ **Flag 10:** `185.92.220.87:8081` (multipart POST of `backup_sync.zip`)
 
 Inline evidence:
-![curl exfil POST - Flag 10](evidence/screenshots/08_curl_post_8081.png)
+![curl exfil POST - Flag 10]<img width="1205" height="295" alt="flag9" src="https://github.com/user-attachments/assets/90b8c300-0c1b-4fdb-8fd6-d8d94bdb14ff" />
+
 
 
 
