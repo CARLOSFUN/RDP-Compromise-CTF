@@ -1,52 +1,61 @@
 # VM RDP Compromise – End-to-End SOC Investigation (CTF)
 
 [![Status: Complete](https://img.shields.io/badge/Status-Complete-brightgreen)](#)
-[![MITRE ATT&CK](https://img.shields.io/badge/MITRE-ATT%26CK-blue)](#mitre-techniques)
-[![KQL](https://img.shields.io/badge/Queries-KQL-informational)](#kql--steps--results)
+[![MITRE ATT\&CK](https://img.shields.io/badge/MITRE-ATT%26CK-blue)](#3-who--what--when--where--why--how-required)
+[![KQL](https://img.shields.io/badge/Queries-KQL-informational)](#1-kql-queries-steps--results)
 
-A hands-on investigation of a **cloud VM RDP compromise** using **Microsoft Defender for Endpoint (MDE) Advanced Hunting (KQL)**.  
-This page contains **everything**: flags, steps, queries, results (screenshot slots), timeline, and recommendations—**all in one place**.
+A hands-on investigation of a **cloud VM RDP compromise** using **Microsoft Defender for Endpoint (MDE) Advanced Hunting (KQL)**.
+This page contains **everything**: flags, steps, queries, results (screenshot slots), timeline, and recommendations — **all in one place**.
 
 ---
 
 ## Scenario
 
-- **Challenge:** “Hide Your RDP: Password Spray Leads to Full Compromise”
-- **Environment:** Cloud Windows VM (hostnames contain **"flare"**)
-- **Tools:** Microsoft Defender for Endpoint (Advanced Hunting), Sentinel (where available)
-- **Incident Date:** 14-Sep-2025  
-- **Investigation Window (UTC):** **15–22 Sep 2025**
+* **Challenge:** “Hide Your RDP: Password Spray Leads to Full Compromise”
+* **Environment:** Cloud Windows VM (hostnames contain **"flare"**)
+* **Tools:** Microsoft Defender for Endpoint (Advanced Hunting), Sentinel (optional)
+* **Incident Date:** 14-Sep-2025
+* **Investigation Window (UTC):** **15–22 Sep 2025**
 
 ---
 
 ## Key Findings (Flags)
 
-| # | Question | Answer |
-|---|---|---|
-| 1 | Attacker IP Address | `159.26.106.84` |
-| 2 | Compromised Account | `slflare` |
-| 3 | Executed Binary Name | `msupdate.exe` |
-| 4 | Full Command Line | `"C:\Users\Public\msupdate.exe" -ExecutionPolicy Bypass -File "C:\Users\Public\update_check.ps1"` |
-| 5 | Persistence Task Name | `MicrosoftUpdateSync` |
-| 6 | Defender Setting Modified | `C:\Windows\Temp` (exclusion) |
-| 7 | Earliest Discovery Command | `"cmd.exe" /c systeminfo"` |
-| 8 | Archive Created | `backup_sync.zip` |
-| 9 | C2 Destination | `185.92.220.87` |
-| 10 | Exfiltration IP:Port | `185.92.220.87:8081` |
+| #  | Question                   | Answer                                                                                            |
+| -- | -------------------------- | ------------------------------------------------------------------------------------------------- |
+| 1  | Attacker IP Address        | `159.26.106.84`                                                                                   |
+| 2  | Compromised Account        | `slflare`                                                                                         |
+| 3  | Executed Binary Name       | `msupdate.exe`                                                                                    |
+| 4  | Full Command Line          | `"C:\Users\Public\msupdate.exe" -ExecutionPolicy Bypass -File "C:\Users\Public\update_check.ps1"` |
+| 5  | Persistence Task Name      | `MicrosoftUpdateSync`                                                                             |
+| 6  | Defender Setting Modified  | `C:\Windows\Temp` (exclusion)                                                                     |
+| 7  | Earliest Discovery Command | `"cmd.exe" /c systeminfo"`                                                                        |
+| 8  | Archive Created            | `backup_sync.zip`                                                                                 |
+| 9  | C2 Destination             | `185.92.220.87`                                                                                   |
+| 10 | Exfiltration IP:Port       | `185.92.220.87:8081`                                                                              |
 
 ---
 
 ## Attack Timeline (UTC)
 
-- **04:39:48 – 17 Sep:** Defender exclusion added → `C:\Windows\Temp`  
-- **04:40:28 – 17 Sep:** Discovery → `"cmd.exe" /c systeminfo`  
-- **04:41:30 – 17 Sep:** Archive created → `backup_sync.zip`  
-- **04:42:17 – 17 Sep:** First outbound to **185.92.220.87**  
-- **04:43:42 – 17 Sep:** Exfil attempt → **185.92.220.87:8081** (`curl.exe` POST)
+* **04:39:48 – 17 Sep:** Defender exclusion added → `C:\Windows\Temp`
+* **04:40:28 – 17 Sep:** Discovery → `"cmd.exe" /c systeminfo`
+* **04:41:30 – 17 Sep:** Archive created → `backup_sync.zip`
+* **04:42:17 – 17 Sep:** First outbound to **185.92.220.87**
+* **04:43:42 – 17 Sep:** Exfil attempt → **185.92.220.87:8081** (`curl.exe` POST)
 
 ---
 
-# KQL + Steps + Results
+## 📑 Table of Contents
+
+1. [KQL Queries, Steps & Results](#1-kql-queries-steps--results)
+2. [Investigation Summary](#2-investigation-summary-required)
+3. [Who / What / When / Where / Why / How](#3-who--what--when--where--why--how-required)
+4. [Recommendations](#4-recommendations-required)
+
+---
+
+## 1. KQL Queries, Steps & Results
 
 **Tips:**
 
@@ -283,115 +292,123 @@ DeviceProcessEvents
 
 Inline evidence:
 ![curl exfil POST - Flag 10](evidence/screenshots/08_curl_post_8081.png)
+<img width="432" height="644" alt="image" src="https://github.com/user-attachments/assets/b55172e7-a15f-45ff-8b14-8394460ea81d" />
+
 
 ---
 
-3. Who, What, When, Where, Why, How (Required)
+## 2. Investigation Summary (Required)
 
-Who:
+**What Happened:**
+An external IP (`159.26.106.84`) successfully authenticated to the `slflare` account on a flare VM via RDP. The attacker executed `msupdate.exe`, added a scheduled task (`MicrosoftUpdateSync`), excluded `C:\Windows\Temp` from Defender, ran `systeminfo`, created `backup_sync.zip`, contacted C2 (`185.92.220.87`), and attempted exfil via HTTP to port `8081`.
 
-Attacker: 159.26.106.84 (initial RDP source); 185.92.220.87 (C2/exfil host)
+**Timeline:**
 
-Victim Account: slflare
+* **Start:** `2025-09-17 04:39:48 UTC` (Defender exclusion write)
+* **End:** `2025-09-17 04:43:42 UTC` (curl POST exfil attempt)
+* **Duration:** ~**3m 54s**
+* **Impact:** **Medium**
 
-Affected System: slflarewinsysmo (cloud VM)
+---
 
-Impact on Users: Possible exposure of files contained in backup_sync.zip; no availability impact noted.
+## 3. Who / What / When / Where / Why / How (Required)
 
-What:
+**Who:**
 
-Attack Type: RDP brute force / password spray leading to system compromise
+* **Attacker:** `159.26.106.84` (initial RDP source); `185.92.220.87` (C2/exfil host)
+* **Victim Account:** `slflare`
+* **Affected System:** `slflarewinsysmo` (cloud VM)
+* **Impact on Users:** Possible exposure of files in `backup_sync.zip`; no availability impact noted.
 
-Malicious Activities:
+**What:**
 
-Executed renamed PowerShell (msupdate.exe) with ExecutionPolicy Bypass
+* **Attack Type:** RDP brute force / password spray leading to compromise
+* **Malicious Activities:**
 
-Established persistence via MicrosoftUpdateSync (scheduled task)
+  * Executed renamed PowerShell (`msupdate.exe`) with ExecutionPolicy Bypass
+  * Persistence via **MicrosoftUpdateSync** (scheduled task)
+  * Added Defender exclusion (`C:\Windows\Temp`)
+  * Reconnaissance via `"cmd.exe" /c systeminfo`
+  * Created archive `backup_sync.zip`
+  * C2 connection + attempted exfil to `185.92.220.87:8081`
+* **MITRE ATT&CK Mapping:**
 
-Added Defender exclusion for C:\Windows\Temp
+  * T1110.001 – Brute Force
+  * T1078 – Valid Accounts
+  * T1204.002 – User Execution
+  * T1059.003 – Command Interpreter
+  * T1053.005 – Scheduled Task
+  * T1562.001 – Impair Defenses
+  * T1082 – System Discovery
+  * T1560.001 – Archive Data
+  * T1071.001 – Application Layer Protocol
+  * T1048.003 – Exfiltration over Unencrypted Protocol
 
-Performed discovery via "cmd.exe" /c systeminfo
+**When:**
 
-Created archive backup_sync.zip
+* First Activity: `2025-09-17 04:39:48 UTC`
+* Last Activity: `2025-09-17 04:43:42 UTC`
+* Duration: ~**3m 54s**
+* Detection Time: `2025-09-17 04:43:42 UTC`
+* Still Active? No
 
-Reached out to C2 185.92.220.87 and attempted exfil to 185.92.220.87:8081
+**Where:**
 
-When:
+* Target: `slflarewinsysmo`
+* Origin: `159.26.106.84`
+* Segment: Cloud VM / Lab
+* Files:
 
-First Malicious Activity: 2025-09-17 04:39:48 UTC
+  * `C:\Users\Public\msupdate.exe`
+  * `C:\ProgramData\Microsoft\Windows\Update\mscloudsync.ps1`
+  * `C:\Users\SLFlare\AppData\Local\Temp\backup_sync.zip`
+  * Defender exclusion: `C:\Windows\Temp`
 
-Last Observed Activity: 2025-09-17 04:43:42 UTC
+**Why:**
 
-Detection Time: 2025-09-17 04:43:42 UTC
+* Motive: Data theft + persistence
+* Value: User data, possible pivot point
 
-Total Attack Duration: ~3m 54s
+**How:**
 
-Is it still active? No (within the investigation window)
+* Initial Access: RDP with valid creds (password spraying)
+* Tools: msupdate.exe (renamed PowerShell), cmd.exe, curl.exe
+* Persistence: Task `"MicrosoftUpdateSync"`
+* Collection: `backup_sync.zip`
+* Comms: HTTP(S) → `185.92.220.87`, exfil to `185.92.220.87:8081`
 
-Where:
+---
 
-Target System: slflarewinsysmo
+## 4. Recommendations (Required)
 
-Attack Origin: External IP 159.26.106.84
+**Immediate:**
 
-Network Segment: Cloud VM / lab segment
+1. Isolate host & block outbound to `185.92.220.87` (esp. `8081`)
+2. Remove persistence (`MicrosoftUpdateSync`) + artifacts
+3. Delete payloads (`msupdate.exe`, `mscloudsync.ps1`, `backup_sync.zip`)
 
-Affected Directories/Files:
+**Short-term (1–30 days):**
+4. Harden RDP (MFA, NLA, IP allowlists/JIT)
+5. Enable PowerShell logging (block `-ExecutionPolicy Bypass` abuse)
+6. Alert on Defender exclusions (esp. writable dirs like Temp)
 
-C:\Users\Public\msupdate.exe
+**Long-term:**
+7. Egress filtering + TLS inspection for ports like `8081`
+8. ASR/App Control: block LOLBin abuse + user-writable execs
+9. Credential hygiene: strong passwords, lockouts, spray detection
 
-C:\ProgramData\Microsoft\Windows\Update\mscloudsync.ps1
+**Detection Improvements:**
 
-C:\Users\SLFlare\AppData\Local\Temp\backup_sync.zip
+* Gaps: limited URL/UA context → rely on IP + process cmdline
+* Alerts: new scheduled tasks, Defender exclusions, curl.exe POST with file upload
+* Queries: start broad → refine by `DeviceName contains "flare"`
 
-Defender exclusion: C:\Windows\Temp
+**Report Status:** Complete
+**Next Review:** 29-Sep-2025
+**Distribution:** Cyber Range
 
-Why (Optional):
+---
 
-Likely Motive: Data theft and maintaining access
+✅ Now your README starts with a **title, badges, summary table, and timeline** → then flows into the **detailed investigation report**.
 
-Target Value: User data and potential pivot point in cloud environment
-
-How:
-
-Initial Access Method: RDP with valid credentials (password spraying)
-
-Tools/Techniques Used: msupdate.exe (renamed PowerShell), cmd.exe, curl.exe, scheduled task, Defender exclusions, HTTP(S) C2
-
-Persistence Method: Scheduled Task "MicrosoftUpdateSync" (plus service/run key)
-
-Data Collection Method: Local ZIP archive (backup_sync.zip)
-
-Communication Method: HTTP/S to 185.92.220.87, HTTP POST to 185.92.220.87:8081
-
-4. Recommendations (Required)
-
-Immediate Actions Needed:
-
-Isolate slflarewinsysmo and block outbound to 185.92.220.87 (all ports, esp. 8081).
-
-Remove persistence: delete task MicrosoftUpdateSync; clean any MSUpdateService / MSCloudSync artifacts.
-
-Eradicate payloads: delete C:\Users\Public\msupdate.exe, C:\ProgramData\Microsoft\Windows\Update\mscloudsync.ps1, and backup_sync.zip.
-
-Short-term Improvements (1–30 days):
-4. Harden RDP: enforce MFA, NLA, IP allowlists/JIT access on cloud VMs.
-5. Enable PowerShell logging (Script Block/Module/Transcription); alert on ExecutionPolicy Bypass from Public/Temp.
-6. Alert on Defender exclusions under …\Windows Defender\Exclusions\Paths — especially writable folders like C:\Windows\Temp.
-
-Long-term Security Enhancements:
-7. Egress filtering & TLS inspection for non-standard ports (e.g., 8081).
-8. ASR rules / App Control to block LOLBin abuse and execution from user-writable paths.
-9. Credential hygiene: password policy, lockout thresholds, and detections for spray patterns.
-
-Detection Improvements (Optional):
-
-Monitoring Gaps Identified: Some events may lack full URL/UA context — rely on RemoteIP and ProcessCommandLine.
-
-Recommended Alerts: New scheduled tasks/services invoking powershell.exe; Defender exclusion path changes; curl.exe POST with -F "file=@…".
-
-Query Improvements: Keep queries simple; widen time windows when in doubt; filter by DeviceName contains "flare" then tighten.
-
-Report Status: Complete
-Next Review: 29-September-2025
-Distribution: Cyber Range
+Do you also want me to make the **Flags table** clickable (each answer links to its detailed Flag section)?
