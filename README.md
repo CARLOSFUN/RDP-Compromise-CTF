@@ -70,5 +70,8 @@ DeviceLogonEvents
 | where Timestamp between (datetime(2025-09-15T00:00:00Z) .. datetime(2025-09-22T23:59:59Z))
 | where DeviceName contains "flare"
 | where LogonType == "RemoteInteractive"   // RDP
-| project Timestamp, DeviceName, AccountName, RemoteIP, ActionType, LogonResult
+| project Timestamp, DeviceName, AccountName, RemoteIP, ActionType, LogonType
 | order by Timestamp asc
+
+<img width="1250" height="391" alt="image" src="https://github.com/user-attachments/assets/de70ff22-aaa0-48e8-b19b-adcb2c764c69" />
+
