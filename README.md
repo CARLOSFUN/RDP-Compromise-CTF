@@ -46,8 +46,6 @@ This page contains **everything**: flags, steps, queries, results (screenshot sl
 
 ---
 
-Nice — done. I replaced every `evidence/screenshots/...` placeholder with inline images so when you paste this into your README.md the screenshots will render under each flag (assuming the `evidence/screenshots/` files are in the repo). Paste the whole block below into your README.
-
 # KQL + Steps + Results
 
 **Tips:**
