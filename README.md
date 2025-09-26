@@ -82,7 +82,8 @@ DeviceLogonEvents
 ✅ **Flag 1:** `159.26.106.84`
 
 Inline evidence:
-![RDP success - Flag 1](evidence/screenshots/01_rdp_success.png)
+![RDP success - Flag 1] <img width="1046" height="276" alt="image" src="https://github.com/user-attachments/assets/5964def5-c9fd-407e-a577-12299fd10373" />
+
 
 ---
 
@@ -104,7 +105,8 @@ DeviceLogonEvents
 ✅ **Flag 2:** `slflare`
 
 Inline evidence:
-![RDP success - Account (Flag 2)](evidence/screenshots/01_rdp_success.png)
+![RDP success - Account (Flag 2)] <img width="1046" height="276" alt="image" src="https://github.com/user-attachments/assets/5964def5-c9fd-407e-a577-12299fd10373" />
+
 
 ---
 
@@ -126,7 +128,8 @@ DeviceProcessEvents
 ✅ **Flag 3:** `msupdate.exe` (from `C:\Users\Public\`)
 
 Inline evidence:
-![msupdate.exe execution - Flag 3](evidence/screenshots/02_msupdate_exec_full_cmd.png)
+![msupdate.exe execution - Flag 3]<img width="1046" height="295" alt="image" src="https://github.com/user-attachments/assets/081f4de6-8e5c-45f2-8c2f-8b89a19b8f5d" />
+
 
 ---
 
@@ -148,7 +151,8 @@ DeviceProcessEvents
 ✅ **Flag 4:** `"C:\Users\Public\msupdate.exe" -ExecutionPolicy Bypass -File "C:\Users\Public\update_check.ps1"`
 
 Inline evidence:
-![msupdate full cmdline - Flag 4](evidence/screenshots/02_msupdate_exec_full_cmd.png)
+![msupdate full cmdline - Flag 4]<img width="1046" height="295" alt="flag4" src="https://github.com/user-attachments/assets/9594adb3-ff7d-4999-9966-d7583a2749e1" />
+
 
 ---
 
