@@ -209,7 +209,8 @@ DeviceRegistryEvents
 ✅ **Flag 6:** `C:\Windows\Temp`
 
 Inline evidence:
-![Defender exclusion - Flag 6](evidence/screenshots/04_defender_exclusion_windows_temp.png)
+![Defender exclusion - Flag 6] <img width="1046" height="295" alt="flag6" src="https://github.com/user-attachments/assets/24133ac1-3536-4ee4-9ac6-d62eabdd96d7" />
+
 
 ---
 
