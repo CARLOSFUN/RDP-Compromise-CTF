@@ -292,7 +292,7 @@ DeviceProcessEvents
 
 Inline evidence:
 ![curl exfil POST - Flag 10](evidence/screenshots/08_curl_post_8081.png)
-<img width="432" height="644" alt="image" src="https://github.com/user-attachments/assets/b55172e7-a15f-45ff-8b14-8394460ea81d" />
+
 
 
 ---
