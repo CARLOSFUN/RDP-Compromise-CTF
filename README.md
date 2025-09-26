@@ -404,6 +404,8 @@ An external IP (`159.26.106.84`) successfully authenticated to the `slflare` acc
 * Queries: start broad → refine by `DeviceName contains "flare"`
 
 **Report Status:** Complete
+
 **Next Review:** 29-Sep-2025
+
 **Distribution:** Cyber Range
 
