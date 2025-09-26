@@ -286,56 +286,112 @@ Inline evidence:
 
 ---
 
-## Investigation Summary
+3. Who, What, When, Where, Why, How (Required)
 
-An external IP (`159.26.106.84`) successfully authenticated to a “flare” VM via RDP using the account `slflare`. The attacker executed a renamed PowerShell binary (`C:\Users\Public\msupdate.exe`) with `-ExecutionPolicy Bypass`, created persistence (`MicrosoftUpdateSync`), added a Defender exclusion for `C:\Windows\Temp`, performed discovery (`cmd.exe` /c `systeminfo`), staged an archive (`backup_sync.zip`), contacted `185.92.220.87`, and attempted exfiltration via HTTP to `185.92.220.87:8081` using `curl.exe`.
+Who:
 
-**Impact:** Medium — data staging observed; single endpoint; no availability impact noted.
+Attacker: 159.26.106.84 (initial RDP source); 185.92.220.87 (C2/exfil host)
 
-**Where / Notable paths:**
+Victim Account: slflare
 
-* `C:\Users\Public\msupdate.exe`
-* `C:\ProgramData\Microsoft\Windows\Update\mscloudsync.ps1`
-* `C:\Users\SLFlare\AppData\Local\Temp\backup_sync.zip`
-* Defender Exclusion: `C:\Windows\Temp`
+Affected System: slflarewinsysmo (cloud VM)
 
----
+Impact on Users: Possible exposure of files contained in backup_sync.zip; no availability impact noted.
 
-## Recommendations (short)
+What:
 
-**Immediate**
+Attack Type: RDP brute force / password spray leading to system compromise
 
-* Isolate host; block `159.26.106.84` & `185.92.220.87` (esp. port `8081`).
-* Remove persistence (scheduled task `MicrosoftUpdateSync`, related services/scripts).
-* Eradicate payloads: `msupdate.exe`, `mscloudsync.ps1`, `backup_sync.zip`.
+Malicious Activities:
 
-**Short-Term (1–30 days)**
+Executed renamed PowerShell (msupdate.exe) with ExecutionPolicy Bypass
 
-* Enforce RDP MFA/NLA/JIT + IP allow-lists.
-* Enable PowerShell logging; alert on `-ExecutionPolicy Bypass` from Public/Temp.
-* Alert on Defender exclusions under `...\Windows Defender\Exclusions\Paths`.
+Established persistence via MicrosoftUpdateSync (scheduled task)
 
-**Long-Term**
+Added Defender exclusion for C:\Windows\Temp
 
-* Egress filtering + TLS inspection for non-standard ports (e.g., `8081`).
-* ASR / App Control to block LOLBin abuse and execution from user-writable paths.
-* Credential hygiene: lockout thresholds, stronger password policy, spray detection.
+Performed discovery via "cmd.exe" /c systeminfo
 
----
+Created archive backup_sync.zip
 
-## MITRE Techniques (mapped)
+Reached out to C2 185.92.220.87 and attempted exfil to 185.92.220.87:8081
 
-* T1110.001 – Brute Force: Password Guessing
-* T1078 – Valid Accounts
-* T1059.003 – Command & Scripting Interpreter (Windows cmd)
-* T1204.002 – User Execution (Malicious File)
-* T1053.005 – Scheduled Task/Job
-* T1562.001 – Impair Defenses (Defender exclusions)
-* T1082 – System Information Discovery
-* T1560.001 – Archive Collected Data
-* T1071.001 – Application Layer Protocol (HTTP/S)
-* T1048.003 – Exfiltration Over Unencrypted Protocol
+When:
 
----
+First Malicious Activity: 2025-09-17 04:39:48 UTC
 
+Last Observed Activity: 2025-09-17 04:43:42 UTC
 
+Detection Time: 2025-09-17 04:43:42 UTC
+
+Total Attack Duration: ~3m 54s
+
+Is it still active? No (within the investigation window)
+
+Where:
+
+Target System: slflarewinsysmo
+
+Attack Origin: External IP 159.26.106.84
+
+Network Segment: Cloud VM / lab segment
+
+Affected Directories/Files:
+
+C:\Users\Public\msupdate.exe
+
+C:\ProgramData\Microsoft\Windows\Update\mscloudsync.ps1
+
+C:\Users\SLFlare\AppData\Local\Temp\backup_sync.zip
+
+Defender exclusion: C:\Windows\Temp
+
+Why (Optional):
+
+Likely Motive: Data theft and maintaining access
+
+Target Value: User data and potential pivot point in cloud environment
+
+How:
+
+Initial Access Method: RDP with valid credentials (password spraying)
+
+Tools/Techniques Used: msupdate.exe (renamed PowerShell), cmd.exe, curl.exe, scheduled task, Defender exclusions, HTTP(S) C2
+
+Persistence Method: Scheduled Task "MicrosoftUpdateSync" (plus service/run key)
+
+Data Collection Method: Local ZIP archive (backup_sync.zip)
+
+Communication Method: HTTP/S to 185.92.220.87, HTTP POST to 185.92.220.87:8081
+
+4. Recommendations (Required)
+
+Immediate Actions Needed:
+
+Isolate slflarewinsysmo and block outbound to 185.92.220.87 (all ports, esp. 8081).
+
+Remove persistence: delete task MicrosoftUpdateSync; clean any MSUpdateService / MSCloudSync artifacts.
+
+Eradicate payloads: delete C:\Users\Public\msupdate.exe, C:\ProgramData\Microsoft\Windows\Update\mscloudsync.ps1, and backup_sync.zip.
+
+Short-term Improvements (1–30 days):
+4. Harden RDP: enforce MFA, NLA, IP allowlists/JIT access on cloud VMs.
+5. Enable PowerShell logging (Script Block/Module/Transcription); alert on ExecutionPolicy Bypass from Public/Temp.
+6. Alert on Defender exclusions under …\Windows Defender\Exclusions\Paths — especially writable folders like C:\Windows\Temp.
+
+Long-term Security Enhancements:
+7. Egress filtering & TLS inspection for non-standard ports (e.g., 8081).
+8. ASR rules / App Control to block LOLBin abuse and execution from user-writable paths.
+9. Credential hygiene: password policy, lockout thresholds, and detections for spray patterns.
+
+Detection Improvements (Optional):
+
+Monitoring Gaps Identified: Some events may lack full URL/UA context — rely on RemoteIP and ProcessCommandLine.
+
+Recommended Alerts: New scheduled tasks/services invoking powershell.exe; Defender exclusion path changes; curl.exe POST with -F "file=@…".
+
+Query Improvements: Keep queries simple; widen time windows when in doubt; filter by DeviceName contains "flare" then tighten.
+
+Report Status: Complete
+Next Review: 29-September-2025
+Distribution: Cyber Range
